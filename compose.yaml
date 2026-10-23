@@ -1,0 +1,6 @@
+services:
+  collector:
+    build: .
+    volumes:
+      - ./docker-data:/data
+    restart: "no"

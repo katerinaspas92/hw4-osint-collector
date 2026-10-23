@@ -1,0 +1,12 @@
+.venv/
+.git/
+__pycache__/
+*.pyc
+*.db
+*.log
+.env
+.env.*
+docker-data/
+collector_backup.py
+collector_run*.txt
+sample_posts.csv
