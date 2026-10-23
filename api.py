@@ -1,3 +1,4 @@
+import os
 import requests
 import time
 import logging
@@ -46,10 +47,20 @@ def fetch_posts(url, params):
         try:
             time.sleep(REQUEST_DELAY)
 
+            proxy_url = os.environ.get("OSINT_PROXY_URL")
+
+            proxies = None
+            if proxy_url:
+                proxies = {
+                    "http": proxy_url,
+                    "https": proxy_url,
+                }
+
             response = requests.get(
                 url,
                 params=params,
-                timeout=20
+                timeout=20,
+                proxies=proxies,
             )
 
             if response.status_code == 429:
