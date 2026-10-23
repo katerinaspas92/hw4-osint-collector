@@ -42,7 +42,36 @@ def get_retry_delay(retry_after, attempt):
         return fallback
 
 
+_token_index = 0
+
+
+def get_next_token():
+    """Выбирает следующий токен из переменной окружения."""
+    global _token_index
+
+    raw_tokens = os.environ.get("OSINT_API_TOKENS", "")
+
+    tokens = [
+        token.strip()
+        for token in raw_tokens.split(",")
+        if token.strip()
+    ]
+
+    if not tokens:
+        return None
+
+    token = tokens[_token_index % len(tokens)]
+    _token_index += 1
+
+    return token
+
+
 def fetch_posts(url, params):
+    token = get_next_token()
+
+    request_headers = {}
+    if token:
+        request_headers["Authorization"] = f"Bearer {token}"
     for attempt in range(MAX_RETRIES + 1):
         try:
             time.sleep(REQUEST_DELAY)
@@ -61,6 +90,7 @@ def fetch_posts(url, params):
                 params=params,
                 timeout=20,
                 proxies=proxies,
+                **({"headers": request_headers} if request_headers else {}),
             )
 
             if response.status_code == 429:
